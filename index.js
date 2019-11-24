@@ -1,7 +1,7 @@
-let land = []
+let cells = []
 const landHeight = 20
 const landWidth = 20
-const debugMode = false
+const debugMode = !false
 let paused = true
 const startButton = document.getElementById('start')
 const pauseButton = document.getElementById('pause')
@@ -12,7 +12,8 @@ init()
 
 function init() {
 	initializeLand()
-	const gameIntervalId = setInterval(renderLand, 200)
+	renderTable()
+	// const gameIntervalId = setInterval(renderCells, 200)
 
 	startButton.addEventListener('click', start)
 	pauseButton.addEventListener('click', pause)
@@ -35,18 +36,16 @@ function reset(arg) {
 
 function initializeLand() {
 	for (let row = 0; row < landHeight; row++) {
-		land[row] = new Array(landWidth)
+		cells[row] = new Array(landWidth)
 
 		for (let column = 0; column < landWidth; column++) {
-			land[row][column] = 0 //false
+			cells[row][column] = 0 //false
 		}
 	}
 }
 
-function renderLand() {
-	var html = ''
-
-	html += '<table cellpadding=0 cellspacing=0>'
+function renderTable() {
+	let html = '<table cellpadding=0 cellspacing=0>'
 
 	for(let row = 0; row < landHeight; row++) {
 		html += '<tr>'
@@ -57,11 +56,11 @@ function renderLand() {
 			if (debugMode) {
 				html += `<td id=${cellIndex}>`
 				html += `<div class="cell-index">${cellIndex}</div>`
-				html += land[row][column] //? 1:0
+				html += cells[row][column] //? 1:0
 				html += '</td>'
 			}
 			else {
-				html += `<td id=${cellIndex} class="${land[row][column] ? "alive" : "dead" }">`
+				html += `<td id=${cellIndex} class="${cells[row][column] ? "alive" : "dead" }">`
 				html += `<div class="cell-index hidden">${cellIndex}</div>`
 				html += '</td>'
 			}
@@ -72,19 +71,21 @@ function renderLand() {
 
 	html += '</table>'
 
-	document.querySelector('#land-canvas').innerHTML = html
-	addEventListenerToCells()
-
-	if (!paused) {
-		getNextGeneration()
-	}
+	document.querySelector('#table-canvas').innerHTML = html
+	addMouseDownListenerToCells()
 }
 
 function renderCells() {
+	let cellContent = '';
+	for(let row = 0; row < landHeight; row++) {
+		for(let column = 0; column < landWidth; column++) {
+			const cellIndex = row*landWidth + column
 
+		}
+	}
 }
 
-function addEventListenerToCells() {
+function addMouseDownListenerToCells() {
 	const cells = document.querySelectorAll('td')
 	for(let i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('mousedown', toggleCellContent)
@@ -99,7 +100,7 @@ function toggleCellContent(e) {
 	const column = cellIndex % landWidth
 	const row = parseInt(cellIndex/landWidth)
 
-	land[row][column] = land[row][column] === 1 ? 0 : 1
+	cells[row][column] = cells[row][column] === 1 ? 0 : 1
 }
 
 /**
@@ -111,42 +112,42 @@ All other live cells die in the next generation.
 Similarly, all other dead cells stay dead.
  */
 function getNextGeneration() {
-	const newLand = shallowCopyOf(land)
+	const newCells = shallowCopyOf(cells)
 
 	for (let row = 0; row < landHeight; ++row) {
 		for (let column = 0; column < landWidth; ++column) {
-			const cellIsAlive = land[row][column] === 1
+			const cellIsAlive = cells[row][column] === 1
 			const neighbors = getNeighborsAround(row, column)
 
 			if (cellIsAlive) {
 				if (neighbors === 2 || neighbors === 3) {
-					newLand[row][column] = 1
+					newCells[row][column] = 1
 				}
 				else {
-					newLand[row][column] = 0
+					newCells[row][column] = 0
 				}
 			}
 			else {
 				if (neighbors === 3) {
-					newLand[row][column] = 1
+					newCells[row][column] = 1
 				}
 				else {
-					newLand[row][column] = 0
+					newCells[row][column] = 0
 				}
 			}
 		}
 	}
 
-	land = shallowCopyOf(newLand)
+	cells = shallowCopyOf(newCells)
 }
 
 function getNeighborsAround(row, column) {
 	let neighbors = 0
-	const cellIsAlive = land[row][column] === 1
+	const cellIsAlive = cells[row][column] === 1
 	for (let dx = -1; dx <= 1; dx++) {
 		for (let dy = -1; dy <= 1; dy++) {
 			if (isWithinBorders(row+dy, column+dx)) {
-				if (land[row+dy][column+dx] === 1) {
+				if (cells[row+dy][column+dx] === 1) {
 					neighbors++
 				}
 			}
@@ -165,7 +166,7 @@ function clickToGetNeighborsAround(event) {
 	const cellIndex = parseInt(cell.getAttribute('id'))
 	const column = cellIndex % landWidth
 	const row = parseInt(cellIndex/landWidth)
-	const cellIsAlive = newLand[row][column] === 1
+	const cellIsAlive = newCells[row][column] === 1
 	const neighbors = getNeighborsAround(row, column)
 
 	// console.log(`${neighbors} NEIGHBORS around ${cellIsAlive ? 'living' : 'dead'} cell at (${row}, ${column})`)
