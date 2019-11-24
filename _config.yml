@@ -1,1 +1,4 @@
 theme: jekyll-theme-cayman
+
+baseurl: /game-of-life
+jekyll serve: --baseurl ''
