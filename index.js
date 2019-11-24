@@ -1,7 +1,9 @@
 let cells = []
-const landHeight = 20
-const landWidth = 20
-const debugMode = !false
+// let cellsInTableArray // declare only once
+const landHeight = 40
+const landWidth = 50
+let timeInterval = 200
+const debugMode = false
 let paused = true
 const startButton = document.getElementById('start')
 const pauseButton = document.getElementById('pause')
@@ -12,8 +14,8 @@ init()
 
 function init() {
 	initializeLand()
-	renderTable()
-	// const gameIntervalId = setInterval(renderCells, 200)
+	renderInitialTable()
+	const gameIntervalId = setInterval(renderCells, timeInterval)
 
 	startButton.addEventListener('click', start)
 	pauseButton.addEventListener('click', pause)
@@ -44,7 +46,7 @@ function initializeLand() {
 	}
 }
 
-function renderTable() {
+function renderInitialTable() {
 	let html = '<table cellpadding=0 cellspacing=0>'
 
 	for(let row = 0; row < landHeight; row++) {
@@ -54,7 +56,7 @@ function renderTable() {
 			const cellIndex = row*landWidth + column
 
 			if (debugMode) {
-				html += `<td id=${cellIndex}>`
+				html += `<td id=${cellIndex} class="${cells[row][column] ? "alive" : "dead" }">`
 				html += `<div class="cell-index">${cellIndex}</div>`
 				html += cells[row][column] //? 1:0
 				html += '</td>'
@@ -71,17 +73,31 @@ function renderTable() {
 
 	html += '</table>'
 
-	document.querySelector('#table-canvas').innerHTML = html
+	document.querySelector('#cells-canvas').innerHTML = html
 	addMouseDownListenerToCells()
 }
 
 function renderCells() {
-	let cellContent = '';
+	const cellsInTableArray = document.querySelectorAll('td')
+	let cellIndex, cellIsAlive
 	for(let row = 0; row < landHeight; row++) {
 		for(let column = 0; column < landWidth; column++) {
-			const cellIndex = row*landWidth + column
+			cellIndex = row*landWidth + column
+			cellIsAlive = cells[row][column] === 1
+			
+			cellsInTableArray[cellIndex].classList = ''
 
+			if (cellIsAlive) {
+				cellsInTableArray[cellIndex].classList.add('alive')
+			}
+			else {
+				cellsInTableArray[cellIndex].classList.add('dead')
+			}
 		}
+	}
+
+	if (!paused) {
+		getNextGeneration()
 	}
 }
 
@@ -89,6 +105,7 @@ function addMouseDownListenerToCells() {
 	const cells = document.querySelectorAll('td')
 	for(let i = 0; i < cells.length; i++) {
 		cells[i].addEventListener('mousedown', toggleCellContent)
+		// cells[i].addEventListener('dragstart', toggleCellContent)
 		cells[i].addEventListener('wheel', clickToGetNeighborsAround)
 	}
 }
