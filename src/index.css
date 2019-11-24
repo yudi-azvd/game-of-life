@@ -15,9 +15,40 @@ table {
 td {
 	width: 32px;
 	height: 32px;
-	color: white;
-	border: 1px solid black;
+	color: black;
+	border: 1px solid grey;
+	
 	font-family: Arial, Helvetica, sans-serif;
+	font-size: 15px;
+
+	text-align: center;
+	vertical-align: center;
+
+	position: relative;
 }
+
+div.cell-index {
+	color: grey;
+
+	display: inline-block;
+	position: absolute;
+
+	font-size: 7px;
+	top: 3px;
+	right: 3px;
+}
+
+.alive {
+	background: black;
+}
+
+.dead {
+	background: white;
+}
+
+div.hidden {
+	display: none;
+}
+
 
 
