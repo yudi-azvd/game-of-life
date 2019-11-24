@@ -1,31 +1,36 @@
-const land = []
-const landWidth = 8
-const landHeight = 8
+let land = []
+const landWidth = 11
+const landHeight = 11
 const debugMode = false
-let started = false
+let paused = true
 const startButton = document.getElementById('start')
 const pauseButton = document.getElementById('pause')
+const resetButton = document.getElementById('reset')
 const nextGenerationButton = document.getElementById('getNextGeneration')
 
 init()
 
 function init() {
 	initializeLand()
-	setInterval(renderLand, 500)
+	const gameIntervalId = setInterval(renderLand, 200)
 
 	startButton.addEventListener('click', start)
 	pauseButton.addEventListener('click', pause)
+	resetButton.addEventListener('click', init)
 	nextGenerationButton.addEventListener('click', getNextGeneration)
 }
 
 function start() {
-	started = true
-	console.log('started')
+	paused = false
 }
 
 function pause() {
-	started = false
-	console.log('paused')
+	paused = true
+}
+
+function stop(arg) {
+	paused = true
+	console.log(arg)
 }
 
 function initializeLand() {
@@ -70,7 +75,7 @@ function renderLand() {
 	document.querySelector('#land-canvas').innerHTML = html
 	addEventListenerToCells()
 
-	if (started) {
+	if (!paused) {
 		getNextGeneration()
 	}
 }
@@ -86,11 +91,11 @@ function addEventListenerToCells() {
 function toggleCellContent(e) {
 	const cell = e.target
 	const cellIndex = parseInt(cell.getAttribute('id'))
+	
 	const column = cellIndex % landWidth
 	const row = parseInt(cellIndex/landWidth)
-	console.log(row, column)
 
-	land[row][column] = land[row][column] ? 0 : 1
+	land[row][column] = land[row][column] === 1 ? 0 : 1
 }
 
 /**
@@ -102,40 +107,45 @@ All other live cells die in the next generation.
 Similarly, all other dead cells stay dead.
  */
 function getNextGeneration() {
-	for (let row = 0; row < landHeight; row++) {
-		for (let column = 0; column < landWidth; column++) {
+	const newLand = shallowCopyOf(land)
+
+	for (let row = 0; row < landHeight; ++row) {
+		for (let column = 0; column < landWidth; ++column) {
 			const cellIsAlive = land[row][column] === 1
 			const neighbors = getNeighborsAround(row, column)
-			console.log('NEIGHBORS', neighbors)
+
+			console.log(`${neighbors} NEIGHBORS around ${cellIsAlive ? 'living' : 'dead'} cell at (${row}, ${column})`)
 
 			if (cellIsAlive) {
 				console.log('cell is CURRENTLY ALIVE')
-				console.log(row, column)
 				if (neighbors === 2 || neighbors === 3) {
-					land[row][column] = 1
+					newLand[row][column] = 1
 					console.log('cell lives')
 				}
 				else {
-					land[row][column] = 0
-					console.log('cell dies')
+					newLand[row][column] = 0
+					// console.log('cell dies')
 				}
 			}
 			else {
 				if (neighbors === 3) {
-					land[row][column] = 1
-					console.log('cell lives')
+					newLand[row][column] = 1
+					console.log('RISE FROM THE DEAD')
 				}
 				else {
-					land[row][column] = 0
-					console.log('cell dies')
+					newLand[row][column] = 0
+					// console.log('cell dies')
 				}
 			}
 		}
 	}
+
+	land = shallowCopyOf(newLand)
 }
 
 function getNeighborsAround(row, column) {
 	let neighbors = 0
+	const cellIsAlive = land[row][column] === 1
 	for (let dx = -1; dx <= 1; dx++) {
 		for (let dy = -1; dy <= 1; dy++) {
 			if (isWithinBorders(row+dy, column+dx)) {
@@ -146,7 +156,7 @@ function getNeighborsAround(row, column) {
 		}
 	}
 
-	return neighbors <= 0 ? 0 : neighbors-1// to discount the cell itself
+	return cellIsAlive ? neighbors-1 : neighbors // to discount the cell itself
 }
 
 function isWithinBorders(y, x) {
@@ -158,6 +168,16 @@ function clickToGetNeighborsAround(event) {
 	const cellIndex = parseInt(cell.getAttribute('id'))
 	const column = cellIndex % landWidth
 	const row = parseInt(cellIndex/landWidth)
-	
-	console.log('NEIGHBORS', getNeighborsAround(row, column))
+	const cellIsAlive = newLand[row][column] === 1
+	const neighbors = getNeighborsAround(row, column)
+
+	console.log(`${neighbors} NEIGHBORS around ${cellIsAlive ? 'living' : 'dead'} cell at (${row}, ${column})`)
+}
+
+function shallowCopyOf(array) {
+	// https://stackoverflow.com/questions/13756482/create-copy-of-multi-dimensional-array-not-reference-javascript
+	const shallowCopy = []
+	for (let i = 0; i < array.length; i++)
+		shallowCopy[i] = array[i].slice(0)
+	return shallowCopy
 }
