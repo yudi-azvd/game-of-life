@@ -3,14 +3,27 @@ body {
 	padding: 0;
 }
 
+h1 {
+	text-align: center;
+	font-family: 'Courier New', Courier, monospace;
+}
+
 #land-canvas {
 	margin: 10px;
 }
+
+
 
 div#control-panel {
 	/* margin: 0 auto; */ /* não funciona */
 	text-align: center;
 	vertical-align: center;
+}
+
+div#control-panel button {
+	font-family: 'Courier New', Courier, monospace;
+	outline: none;
+	background: white;
 }
 
 table {
