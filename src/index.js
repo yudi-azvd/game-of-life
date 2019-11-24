@@ -1,6 +1,6 @@
 let land = []
-const landWidth = 11
-const landHeight = 11
+const landHeight = 20
+const landWidth = 20
 const debugMode = false
 let paused = true
 const startButton = document.getElementById('start')
@@ -16,7 +16,7 @@ function init() {
 
 	startButton.addEventListener('click', start)
 	pauseButton.addEventListener('click', pause)
-	resetButton.addEventListener('click', init)
+	resetButton.addEventListener('click', reset)
 	nextGenerationButton.addEventListener('click', getNextGeneration)
 }
 
@@ -28,9 +28,9 @@ function pause() {
 	paused = true
 }
 
-function stop(arg) {
+function reset(arg) {
+	init()
 	paused = true
-	console.log(arg)
 }
 
 function initializeLand() {
@@ -80,6 +80,10 @@ function renderLand() {
 	}
 }
 
+function renderCells() {
+
+}
+
 function addEventListenerToCells() {
 	const cells = document.querySelectorAll('td')
 	for(let i = 0; i < cells.length; i++) {
@@ -114,27 +118,20 @@ function getNextGeneration() {
 			const cellIsAlive = land[row][column] === 1
 			const neighbors = getNeighborsAround(row, column)
 
-			console.log(`${neighbors} NEIGHBORS around ${cellIsAlive ? 'living' : 'dead'} cell at (${row}, ${column})`)
-
 			if (cellIsAlive) {
-				console.log('cell is CURRENTLY ALIVE')
 				if (neighbors === 2 || neighbors === 3) {
 					newLand[row][column] = 1
-					console.log('cell lives')
 				}
 				else {
 					newLand[row][column] = 0
-					// console.log('cell dies')
 				}
 			}
 			else {
 				if (neighbors === 3) {
 					newLand[row][column] = 1
-					console.log('RISE FROM THE DEAD')
 				}
 				else {
 					newLand[row][column] = 0
-					// console.log('cell dies')
 				}
 			}
 		}
@@ -171,7 +168,7 @@ function clickToGetNeighborsAround(event) {
 	const cellIsAlive = newLand[row][column] === 1
 	const neighbors = getNeighborsAround(row, column)
 
-	console.log(`${neighbors} NEIGHBORS around ${cellIsAlive ? 'living' : 'dead'} cell at (${row}, ${column})`)
+	// console.log(`${neighbors} NEIGHBORS around ${cellIsAlive ? 'living' : 'dead'} cell at (${row}, ${column})`)
 }
 
 function shallowCopyOf(array) {
