@@ -15,7 +15,7 @@ init()
 function init() {
 	initializeLand()
 	renderInitialTable()
-	const gameIntervalId = setInterval(renderCells, timeInterval)
+	const gameIntervalId = setInterval(updateCells, timeInterval)
 
 	startButton.addEventListener('click', start)
 	pauseButton.addEventListener('click', pause)
@@ -77,7 +77,7 @@ function renderInitialTable() {
 	addMouseDownListenerToCells()
 }
 
-function renderCells() {
+function updateCells() {
 	const cellsInTableArray = document.querySelectorAll('td')
 	let cellIndex, cellIsAlive
 	for(let row = 0; row < landHeight; row++) {
